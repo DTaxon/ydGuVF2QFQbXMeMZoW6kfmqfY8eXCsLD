@@ -20,6 +20,8 @@ window.POOL_CONFIG = {
   // Change this to whatever password you want admins to enter.
   adminPassword: "football2026",
 
+  allowDuplicateNames: false,
+
   // Keep your existing Supabase values here.
   supabaseUrl: "https://wsluhvnzyejzazecxjhe.supabase.co/",
   supabaseKey: "sb_publishable_dGCOYIAu3bHaV_8MxPIjVg_9Auuipbh",
@@ -32,6 +34,8 @@ window.POOL_CONFIG = {
 
     openCountLabel: "spots open",
     claimedCountLabel: "claimed",
+    duplicateNameError: "That name already has a square. Please only claim one square at this time.",
+    duplicateCheckError: "Could not verify whether this name is already signed up. Please try again.",
 
     spotsHeading: "Choose a square!\n($34 per square payable to Drake via Venmo, Paypal, or cold hard cash.)",
     spotsHelp: "Green spots are available. Claimed spots show the participant's name.",
