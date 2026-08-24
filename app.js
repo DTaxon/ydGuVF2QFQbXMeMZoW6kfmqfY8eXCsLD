@@ -5,6 +5,7 @@
   const text = config.text || {};
   const totalSpots = Number(config.totalSpots) || 25;
   const refreshMs = Math.max(5, Number(config.refreshSeconds) || 10) * 1000;
+  const allowDuplicateNames = config.allowDuplicateNames === true;
 
   const fill = (template, values = {}) =>
     String(template || "").replace(/\{(\w+)\}/g, (_, key) =>
@@ -72,6 +73,7 @@
     elements.refresh.textContent = text.refreshButton || "";
     elements.adminButton.textContent = text.adminButton || "";
     elements.footerText.textContent = text.footerText || "";
+
     document.querySelectorAll(".dialog-close").forEach((button) => {
       button.setAttribute("aria-label", text.closeButtonLabel || "");
     });
@@ -100,12 +102,49 @@
     String(config.supabaseKey).includes("PASTE_YOUR_");
 
   let client = null;
+
   if (!configMissing && window.supabase?.createClient) {
-    client = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
+    client = window.supabase.createClient(
+      config.supabaseUrl,
+      config.supabaseKey
+    );
   }
 
   let isAdmin = false;
   let currentSignups = [];
+
+  const normalizeName = (value) =>
+    String(value || "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .toLocaleLowerCase();
+
+  const duplicateNameExists = async (name, excludeSpot = null) => {
+    if (allowDuplicateNames) {
+      return false;
+    }
+
+    const { data, error } = await client
+      .from("office_pool_signups")
+      .select("spot,name");
+
+    if (error) {
+      throw error;
+    }
+
+    const normalizedName = normalizeName(name);
+
+    return (data || []).some((row) => {
+      if (
+        excludeSpot !== null &&
+        Number(row.spot) === Number(excludeSpot)
+      ) {
+        return false;
+      }
+
+      return normalizeName(row.name) === normalizedName;
+    });
+  };
 
   const setStatus = (message = "", isError = false) => {
     elements.status.textContent = message;
@@ -121,36 +160,57 @@
 
   const updateAdminUI = () => {
     elements.adminBadge.hidden = !isAdmin;
-    elements.adminBadge.textContent = isAdmin ? text.adminModeLabel || "" : "";
-    elements.adminButton.textContent = isAdmin ? (text.adminExitButton || "") : (text.adminButton || "");
+    elements.adminBadge.textContent =
+      isAdmin ? text.adminModeLabel || "" : "";
+
+    elements.adminButton.textContent = isAdmin
+      ? text.adminExitButton || ""
+      : text.adminButton || "";
   };
 
   const renderSpots = (signups) => {
     currentSignups = signups || [];
-    const claimed = new Map(currentSignups.map((row) => [Number(row.spot), row.name]));
+
+    const claimed = new Map(
+      currentSignups.map((row) => [
+        Number(row.spot),
+        row.name
+      ])
+    );
+
     const fragment = document.createDocumentFragment();
 
     for (let spot = 1; spot <= totalSpots; spot += 1) {
       const name = claimed.get(spot);
+
       const button = document.createElement("button");
       button.type = "button";
-      button.className = `spot ${name ? "claimed" : "available"}${name && isAdmin ? " admin-editable" : ""}`;
+      button.className =
+        `spot ${name ? "claimed" : "available"}` +
+        `${name && isAdmin ? " admin-editable" : ""}`;
+
       button.dataset.spot = String(spot);
 
       const number = document.createElement("span");
       number.className = "spot-number";
-      number.textContent = `${text.spotWord || ""} ${spot}`.trim();
+      number.textContent =
+        `${text.spotWord || ""} ${spot}`.trim();
 
       const label = document.createElement("span");
       label.className = "spot-name";
-      label.textContent = name || text.availableLabel || "";
+      label.textContent =
+        name || text.availableLabel || "";
 
       button.append(number, label);
 
       if (!name) {
-        button.addEventListener("click", () => openSignup(spot));
+        button.addEventListener("click", () => {
+          openSignup(spot);
+        });
       } else if (isAdmin) {
-        button.addEventListener("click", () => openAdminEdit(spot, name));
+        button.addEventListener("click", () => {
+          openAdminEdit(spot, name);
+        });
       } else {
         button.disabled = true;
       }
@@ -159,8 +219,12 @@
     }
 
     elements.grid.replaceChildren(fragment);
-    elements.claimedCount.textContent = String(claimed.size);
-    elements.openCount.textContent = String(Math.max(0, totalSpots - claimed.size));
+
+    elements.claimedCount.textContent =
+      String(claimed.size);
+
+    elements.openCount.textContent =
+      String(Math.max(0, totalSpots - claimed.size));
   };
 
   const loadSignups = async ({ quiet = false } = {}) => {
@@ -170,7 +234,9 @@
       return;
     }
 
-    if (!quiet) setStatus(text.refreshing || "");
+    if (!quiet) {
+      setStatus(text.refreshing || "");
+    }
 
     const { data, error } = await client
       .from("office_pool_signups")
@@ -184,200 +250,424 @@
     }
 
     renderSpots(data || []);
+
     if (data?.length >= totalSpots) {
       setStatus(text.allClaimed || "");
     } else if (!quiet) {
       setStatus("");
     }
-    elements.lastUpdated.textContent = `${text.updatedPrefix || ""} ${formatTime(new Date())}`.trim();
+
+    elements.lastUpdated.textContent =
+      `${text.updatedPrefix || ""} ${formatTime(new Date())}`.trim();
   };
 
   const closeDialog = (dialog) => {
-    if (dialog?.open) dialog.close();
+    if (dialog?.open) {
+      dialog.close();
+    }
   };
 
   const openSignup = (spot) => {
     elements.selectedSpot.value = String(spot);
-    elements.claimDialogTitle.textContent = fill(text.claimDialogTitle, { spot });
+
+    elements.claimDialogTitle.textContent =
+      fill(text.claimDialogTitle, { spot });
+
     elements.participantName.value = "";
     elements.formError.textContent = "";
+
     elements.signupDialog.showModal();
-    requestAnimationFrame(() => elements.participantName.focus());
+
+    requestAnimationFrame(() => {
+      elements.participantName.focus();
+    });
   };
 
   const openAdminLogin = () => {
     elements.adminPassword.value = "";
     elements.adminLoginError.textContent = "";
+
     elements.adminLoginDialog.showModal();
-    requestAnimationFrame(() => elements.adminPassword.focus());
+
+    requestAnimationFrame(() => {
+      elements.adminPassword.focus();
+    });
   };
 
   const openAdminEdit = (spot, name) => {
     elements.adminSelectedSpot.value = String(spot);
     elements.adminParticipantName.value = name;
-    elements.adminEditTitle.textContent = fill(text.adminEditTitle, { spot });
+
+    elements.adminEditTitle.textContent =
+      fill(text.adminEditTitle, { spot });
+
     elements.adminEditError.textContent = "";
+
     elements.adminEditDialog.showModal();
-    requestAnimationFrame(() => elements.adminParticipantName.focus());
+
+    requestAnimationFrame(() => {
+      elements.adminParticipantName.focus();
+    });
   };
 
-  elements.signupForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    elements.formError.textContent = "";
+  elements.signupForm.addEventListener(
+    "submit",
+    async (event) => {
+      event.preventDefault();
 
-    if (!client) {
-      elements.formError.textContent = text.databaseNotConfigured || "";
-      return;
-    }
+      elements.formError.textContent = "";
 
-    const spot = Number(elements.selectedSpot.value);
-    const name = elements.participantName.value.trim().replace(/\s+/g, " ");
-
-    if (!Number.isInteger(spot) || spot < 1 || spot > totalSpots) {
-      elements.formError.textContent = text.invalidSpot || "";
-      return;
-    }
-    if (!name) {
-      elements.formError.textContent = text.enterName || "";
-      return;
-    }
-
-    elements.submitButton.disabled = true;
-    elements.submitButton.textContent = text.claimingButton || "";
-
-    const { error } = await client
-      .from("office_pool_signups")
-      .insert({ spot, name });
-
-    elements.submitButton.disabled = false;
-    elements.submitButton.textContent = text.claimButton || "";
-
-    if (error) {
-      console.error(error);
-      if (error.code === "23505") {
-        elements.formError.textContent = text.spotJustClaimed || "";
-        await loadSignups({ quiet: true });
-      } else {
-        elements.formError.textContent = text.signupSaveError || "";
+      if (!client) {
+        elements.formError.textContent =
+          text.databaseNotConfigured || "";
+        return;
       }
-      return;
+
+      const spot =
+        Number(elements.selectedSpot.value);
+
+      const name =
+        elements.participantName.value
+          .trim()
+          .replace(/\s+/g, " ");
+
+      if (
+        !Number.isInteger(spot) ||
+        spot < 1 ||
+        spot > totalSpots
+      ) {
+        elements.formError.textContent =
+          text.invalidSpot || "";
+        return;
+      }
+
+      if (!name) {
+        elements.formError.textContent =
+          text.enterName || "";
+        return;
+      }
+
+      if (!allowDuplicateNames) {
+        try {
+          const duplicate =
+            await duplicateNameExists(name);
+
+          if (duplicate) {
+            elements.formError.textContent =
+              text.duplicateNameError ||
+              "That name already has a square.";
+
+            return;
+          }
+        } catch (error) {
+          console.error(error);
+
+          elements.formError.textContent =
+            text.duplicateCheckError ||
+            "Could not verify whether this name is already signed up. Please try again.";
+
+          return;
+        }
+      }
+
+      elements.submitButton.disabled = true;
+      elements.submitButton.textContent =
+        text.claimingButton || "";
+
+      const { error } = await client
+        .from("office_pool_signups")
+        .insert({
+          spot,
+          name
+        });
+
+      elements.submitButton.disabled = false;
+      elements.submitButton.textContent =
+        text.claimButton || "";
+
+      if (error) {
+        console.error(error);
+
+        if (error.code === "23505") {
+          elements.formError.textContent =
+            text.spotJustClaimed || "";
+
+          await loadSignups({
+            quiet: true
+          });
+        } else {
+          elements.formError.textContent =
+            text.signupSaveError || "";
+        }
+
+        return;
+      }
+
+      closeDialog(elements.signupDialog);
+
+      await loadSignups({
+        quiet: true
+      });
+
+      setStatus(
+        fill(text.signupSuccess, {
+          spot,
+          name
+        })
+      );
     }
+  );
 
-    closeDialog(elements.signupDialog);
-    await loadSignups({ quiet: true });
-    setStatus(fill(text.signupSuccess, { spot, name }));
-  });
+  elements.adminButton.addEventListener(
+    "click",
+    () => {
+      if (isAdmin) {
+        isAdmin = false;
 
-  elements.adminButton.addEventListener("click", () => {
-    if (isAdmin) {
-      isAdmin = false;
+        updateAdminUI();
+        renderSpots(currentSignups);
+
+        setStatus(
+          text.adminModeDisabled || ""
+        );
+      } else {
+        openAdminLogin();
+      }
+    }
+  );
+
+  elements.adminLoginForm.addEventListener(
+    "submit",
+    (event) => {
+      event.preventDefault();
+
+      elements.adminLoginError.textContent = "";
+
+      if (
+        elements.adminPassword.value !==
+        String(config.adminPassword || "")
+      ) {
+        elements.adminLoginError.textContent =
+          text.adminInvalidPassword || "";
+
+        return;
+      }
+
+      isAdmin = true;
+
+      closeDialog(elements.adminLoginDialog);
+
       updateAdminUI();
       renderSpots(currentSignups);
-      setStatus(text.adminModeDisabled || "");
-    } else {
-      openAdminLogin();
+
+      setStatus(
+        text.adminModeEnabled || ""
+      );
     }
-  });
+  );
 
-  elements.adminLoginForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    elements.adminLoginError.textContent = "";
+  elements.adminEditForm.addEventListener(
+    "submit",
+    async (event) => {
+      event.preventDefault();
 
-    if (elements.adminPassword.value !== String(config.adminPassword || "")) {
-      elements.adminLoginError.textContent = text.adminInvalidPassword || "";
-      return;
+      elements.adminEditError.textContent = "";
+
+      if (!isAdmin || !client) {
+        return;
+      }
+
+      const spot =
+        Number(elements.adminSelectedSpot.value);
+
+      const name =
+        elements.adminParticipantName.value
+          .trim()
+          .replace(/\s+/g, " ");
+
+      if (!name) {
+        elements.adminEditError.textContent =
+          text.enterName || "";
+
+        return;
+      }
+
+      if (!allowDuplicateNames) {
+        try {
+          const duplicate =
+            await duplicateNameExists(
+              name,
+              spot
+            );
+
+          if (duplicate) {
+            elements.adminEditError.textContent =
+              text.duplicateNameError ||
+              "That name already has a square.";
+
+            return;
+          }
+        } catch (error) {
+          console.error(error);
+
+          elements.adminEditError.textContent =
+            text.duplicateCheckError ||
+            "Could not verify whether this name is already signed up. Please try again.";
+
+          return;
+        }
+      }
+
+      elements.adminSaveButton.disabled = true;
+      elements.adminSaveButton.textContent =
+        text.adminSavingButton || "";
+
+      const { error } = await client
+        .from("office_pool_signups")
+        .update({
+          name
+        })
+        .eq("spot", spot);
+
+      elements.adminSaveButton.disabled = false;
+      elements.adminSaveButton.textContent =
+        text.adminSaveButton || "";
+
+      if (error) {
+        console.error(error);
+
+        elements.adminEditError.textContent =
+          text.adminSaveError || "";
+
+        return;
+      }
+
+      closeDialog(elements.adminEditDialog);
+
+      await loadSignups({
+        quiet: true
+      });
+
+      setStatus(
+        fill(text.adminSaveSuccess, {
+          spot,
+          name
+        })
+      );
     }
+  );
 
-    isAdmin = true;
-    closeDialog(elements.adminLoginDialog);
-    updateAdminUI();
-    renderSpots(currentSignups);
-    setStatus(text.adminModeEnabled || "");
-  });
+  elements.adminRemoveButton.addEventListener(
+    "click",
+    async () => {
+      elements.adminEditError.textContent = "";
 
-  elements.adminEditForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    elements.adminEditError.textContent = "";
+      if (!isAdmin || !client) {
+        return;
+      }
 
-    if (!isAdmin || !client) return;
+      const spot =
+        Number(elements.adminSelectedSpot.value);
 
-    const spot = Number(elements.adminSelectedSpot.value);
-    const name = elements.adminParticipantName.value.trim().replace(/\s+/g, " ");
+      const row =
+        currentSignups.find(
+          (signup) =>
+            Number(signup.spot) === spot
+        );
 
-    if (!name) {
-      elements.adminEditError.textContent = text.enterName || "";
-      return;
+      const name =
+        row?.name ||
+        elements.adminParticipantName.value.trim();
+
+      const confirmed =
+        window.confirm(
+          fill(text.adminRemoveConfirm, {
+            spot,
+            name
+          })
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      elements.adminRemoveButton.disabled = true;
+      elements.adminRemoveButton.textContent =
+        text.adminRemovingButton || "";
+
+      const { error } = await client
+        .from("office_pool_signups")
+        .delete()
+        .eq("spot", spot);
+
+      elements.adminRemoveButton.disabled = false;
+      elements.adminRemoveButton.textContent =
+        text.adminRemoveButton || "";
+
+      if (error) {
+        console.error(error);
+
+        elements.adminEditError.textContent =
+          text.adminRemoveError || "";
+
+        return;
+      }
+
+      closeDialog(elements.adminEditDialog);
+
+      await loadSignups({
+        quiet: true
+      });
+
+      setStatus(
+        fill(text.adminRemoveSuccess, {
+          spot
+        })
+      );
     }
+  );
 
-    elements.adminSaveButton.disabled = true;
-    elements.adminSaveButton.textContent = text.adminSavingButton || "";
-
-    const { error } = await client
-      .from("office_pool_signups")
-      .update({ name })
-      .eq("spot", spot);
-
-    elements.adminSaveButton.disabled = false;
-    elements.adminSaveButton.textContent = text.adminSaveButton || "";
-
-    if (error) {
-      console.error(error);
-      elements.adminEditError.textContent = text.adminSaveError || "";
-      return;
-    }
-
-    closeDialog(elements.adminEditDialog);
-    await loadSignups({ quiet: true });
-    setStatus(fill(text.adminSaveSuccess, { spot, name }));
-  });
-
-  elements.adminRemoveButton.addEventListener("click", async () => {
-    elements.adminEditError.textContent = "";
-    if (!isAdmin || !client) return;
-
-    const spot = Number(elements.adminSelectedSpot.value);
-    const row = currentSignups.find((signup) => Number(signup.spot) === spot);
-    const name = row?.name || elements.adminParticipantName.value.trim();
-
-    const confirmed = window.confirm(fill(text.adminRemoveConfirm, { spot, name }));
-    if (!confirmed) return;
-
-    elements.adminRemoveButton.disabled = true;
-    elements.adminRemoveButton.textContent = text.adminRemovingButton || "";
-
-    const { error } = await client
-      .from("office_pool_signups")
-      .delete()
-      .eq("spot", spot);
-
-    elements.adminRemoveButton.disabled = false;
-    elements.adminRemoveButton.textContent = text.adminRemoveButton || "";
-
-    if (error) {
-      console.error(error);
-      elements.adminEditError.textContent = text.adminRemoveError || "";
-      return;
-    }
-
-    closeDialog(elements.adminEditDialog);
-    await loadSignups({ quiet: true });
-    setStatus(fill(text.adminRemoveSuccess, { spot }));
-  });
-
-  document.querySelectorAll(".dialog-close").forEach((button) => {
-    button.addEventListener("click", () => closeDialog(button.closest("dialog")));
-  });
-
-  [elements.signupDialog, elements.adminLoginDialog, elements.adminEditDialog].forEach((dialog) => {
-    dialog.addEventListener("click", (event) => {
-      if (event.target === dialog) closeDialog(dialog);
+  document
+    .querySelectorAll(".dialog-close")
+    .forEach((button) => {
+      button.addEventListener(
+        "click",
+        () => {
+          closeDialog(
+            button.closest("dialog")
+          );
+        }
+      );
     });
+
+  [
+    elements.signupDialog,
+    elements.adminLoginDialog,
+    elements.adminEditDialog
+  ].forEach((dialog) => {
+    dialog.addEventListener(
+      "click",
+      (event) => {
+        if (event.target === dialog) {
+          closeDialog(dialog);
+        }
+      }
+    );
   });
 
-  elements.refresh.addEventListener("click", () => loadSignups());
+  elements.refresh.addEventListener(
+    "click",
+    () => {
+      loadSignups();
+    }
+  );
 
   updateAdminUI();
   renderSpots([]);
   loadSignups();
-  window.setInterval(() => loadSignups({ quiet: true }), refreshMs);
+
+  window.setInterval(
+    () => loadSignups({ quiet: true }),
+    refreshMs
+  );
 })();
