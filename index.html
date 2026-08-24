@@ -3,25 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Sign up for the 2026 Packer fotball pool. Cost is $34 per square payable in cash, Venmo, or Paypal to Drake.">
-  <title>2026 Packer Football Pool</title>
+  <meta id="meta-description" name="description" content="">
+  <title></title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="page-shell">
     <section class="hero">
-      <p class="eyebrow">2026 Packer Football Pool</p>
-      <h1 id="pool-title">Sign Up Sheet</h1>
-      <p id="pool-subtitle" class="subtitle">Choose an open spot and enter your name. Please only claim 1 spot.</p>
+      <h1 id="pool-title"></h1>
+      <p id="pool-intro" class="subtitle"></p>
 
       <div class="summary" aria-live="polite">
         <div>
           <span id="open-count" class="summary-number">25</span>
-          <span class="summary-label">spots open</span>
+          <span id="open-count-label" class="summary-label"></span>
         </div>
         <div>
           <span id="claimed-count" class="summary-number">0</span>
-          <span class="summary-label">claimed</span>
+          <span id="claimed-count-label" class="summary-label"></span>
         </div>
       </div>
     </section>
@@ -29,10 +28,14 @@
     <section class="content-card" aria-labelledby="spots-heading">
       <div class="section-heading">
         <div>
-          <h2 id="spots-heading">Choose a spot</h2>
-          <p>Green spots are available. Claimed spots show the participant's name.</p>
+          <h2 id="spots-heading"></h2>
+          <p id="spots-help"></p>
         </div>
-        <button id="refresh-button" class="secondary-button" type="button">Refresh</button>
+        <div class="section-actions">
+          <span id="admin-badge" class="admin-badge" hidden></span>
+          <button id="admin-button" class="secondary-button" type="button"></button>
+          <button id="refresh-button" class="secondary-button" type="button"></button>
+        </div>
       </div>
 
       <div id="status-message" class="status-message" role="status" aria-live="polite"></div>
@@ -40,24 +43,55 @@
     </section>
 
     <footer>
-      <span>First come, first served.</span>
+      <span id="footer-text"></span>
       <span id="last-updated"></span>
     </footer>
   </main>
 
   <dialog id="signup-dialog" class="signup-dialog">
     <form id="signup-form" method="dialog">
-      <button id="close-dialog" class="icon-button" type="button" aria-label="Close">&times;</button>
-      <p class="eyebrow">CLAIM SPOT</p>
-      <h2>Spot <span id="selected-spot-label"></span></h2>
-      <p class="dialog-copy">Enter your name exactly as you want it displayed on the signup sheet.</p>
+      <button class="icon-button dialog-close" type="button" aria-label="">&times;</button>
+      <h2 id="claim-dialog-title"></h2>
+      <p id="claim-dialog-copy" class="dialog-copy"></p>
 
-      <label for="participant-name">Name</label>
+      <label id="claim-name-label" for="participant-name"></label>
       <input id="participant-name" name="participant-name" type="text" maxlength="80" autocomplete="name" required>
       <input id="selected-spot" type="hidden">
 
       <div id="form-error" class="form-error" role="alert"></div>
-      <button id="submit-button" class="primary-button" type="submit">Claim this spot</button>
+      <button id="submit-button" class="primary-button" type="submit"></button>
+    </form>
+  </dialog>
+
+  <dialog id="admin-login-dialog" class="signup-dialog">
+    <form id="admin-login-form" method="dialog">
+      <button class="icon-button dialog-close" type="button" aria-label="">&times;</button>
+      <h2 id="admin-login-title"></h2>
+      <p id="admin-login-copy" class="dialog-copy"></p>
+
+      <label id="admin-password-label" for="admin-password"></label>
+      <input id="admin-password" name="admin-password" type="password" autocomplete="current-password" required>
+
+      <div id="admin-login-error" class="form-error" role="alert"></div>
+      <button id="admin-unlock-button" class="primary-button" type="submit"></button>
+    </form>
+  </dialog>
+
+  <dialog id="admin-edit-dialog" class="signup-dialog">
+    <form id="admin-edit-form" method="dialog">
+      <button class="icon-button dialog-close" type="button" aria-label="">&times;</button>
+      <h2 id="admin-edit-title"></h2>
+      <p id="admin-edit-copy" class="dialog-copy"></p>
+
+      <label id="admin-name-label" for="admin-participant-name"></label>
+      <input id="admin-participant-name" name="admin-participant-name" type="text" maxlength="80" autocomplete="off" required>
+      <input id="admin-selected-spot" type="hidden">
+
+      <div id="admin-edit-error" class="form-error" role="alert"></div>
+      <div class="admin-edit-actions">
+        <button id="admin-save-button" class="primary-button" type="submit"></button>
+        <button id="admin-remove-button" class="danger-button" type="button"></button>
+      </div>
     </form>
   </dialog>
 
