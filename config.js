@@ -28,12 +28,12 @@ window.POOL_CONFIG = {
     pageTitle: "2026 Packer Football Pool",
     metaDescription: "Signup sheet for the 2026 Packer Football Pool.",
 
-    intro: "Choose an open spot and enter your name. Please only claim 1 spot at this time. Open spots will be offered for doubles as the start of the season approaches.",
+    intro: "Choose an open square and enter your name. Please only claim 1 spot at this time. Open spots will be offered for doubles as the start of the season approaches.",
 
     openCountLabel: "spots open",
     claimedCountLabel: "claimed",
 
-    spotsHeading: "Choose a spot",
+    spotsHeading: "Choose a square! ($34 per square payable to Drake via Venmo, Paylpal, or cold hard cash.)",
     spotsHelp: "Green spots are available. Claimed spots show the participant's name.",
     refreshButton: "Refresh",
     spotWord: "Spot",
