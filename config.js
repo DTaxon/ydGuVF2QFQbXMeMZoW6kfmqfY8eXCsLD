@@ -32,15 +32,15 @@ window.POOL_CONFIG = {
 
     intro: "Choose an open square and enter your name. Please only claim 1 square at this time. Open squares will be offered for doubles as the start of the season approaches.",
 
-    openCountLabel: "squaress open",
+    openCountLabel: "squares open",
     claimedCountLabel: "claimed",
     duplicateNameError: "That name already has a square. Please only claim one square at this time.",
     duplicateCheckError: "Could not verify whether this name is already signed up. Please try again.",
 
-    spotsHeading: "Choose a square!\n($34 per square payable to Drake via Venmo, Paypal, or cold hard cash.)",
+    spotsHeading: "Choose a Square!\n$34 per square payable to Drake via Venmo, Paypal, or cold hard cash",
     spotsHelp: "Green squares are available. Claimed squares show the participant's name.",
     refreshButton: "Refresh",
-    spotWord: "#",
+    spotWord: "Square",
     availableLabel: "Available",
 
     footerText: "First come, first served.",
