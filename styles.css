@@ -93,7 +93,7 @@ h1 {
 .section-heading h2 { margin-bottom: 5px; font-size: 1.35rem; }
 .section-heading p { margin-bottom: 0; color: var(--muted); }
 
-spots-heading {
+#spots-heading {
     white-space: pre-line;
 }
 
