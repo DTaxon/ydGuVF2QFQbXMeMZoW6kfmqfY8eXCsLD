@@ -25,7 +25,7 @@ window.POOL_CONFIG = {
   supabaseKey: "sb_publishable_dGCOYIAu3bHaV_8MxPIjVg_9Auuipbh",
 
   text: {
-    pageTitle: "2026 Packer Football Pool",
+    pageTitle: "2026 Packer Football Pool Sign Up",
     metaDescription: "Signup sheet for the 2026 Packer Football Pool.",
 
     intro: "Choose an open square and enter your name. Please only claim 1 spot at this time. Open spots will be offered for doubles as the start of the season approaches.",
