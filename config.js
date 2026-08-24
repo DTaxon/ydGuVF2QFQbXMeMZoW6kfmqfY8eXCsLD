@@ -33,7 +33,7 @@ window.POOL_CONFIG = {
     openCountLabel: "spots open",
     claimedCountLabel: "claimed",
 
-    spotsHeading: "Choose a square! ($34 per square payable to Drake via Venmo, Paylpal, or cold hard cash.)",
+    spotsHeading: "Choose a square!\n($34 per square payable to Drake via Venmo, Paypal, or cold hard cash.)",
     spotsHelp: "Green spots are available. Claimed spots show the participant's name.",
     refreshButton: "Refresh",
     spotWord: "Spot",
