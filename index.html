@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Office pool signup sheet with 25 spots.">
+  <title>Office Pool Signup</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero">
+      <p class="eyebrow">OFFICE POOL</p>
+      <h1 id="pool-title">Office Pool Signup</h1>
+      <p id="pool-subtitle" class="subtitle">Choose an open spot and enter your name.</p>
+
+      <div class="summary" aria-live="polite">
+        <div>
+          <span id="open-count" class="summary-number">25</span>
+          <span class="summary-label">spots open</span>
+        </div>
+        <div>
+          <span id="claimed-count" class="summary-number">0</span>
+          <span class="summary-label">claimed</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-card" aria-labelledby="spots-heading">
+      <div class="section-heading">
+        <div>
+          <h2 id="spots-heading">Choose a spot</h2>
+          <p>Green spots are available. Claimed spots show the participant's name.</p>
+        </div>
+        <button id="refresh-button" class="secondary-button" type="button">Refresh</button>
+      </div>
+
+      <div id="status-message" class="status-message" role="status" aria-live="polite"></div>
+      <div id="spots-grid" class="spots-grid" aria-live="polite"></div>
+    </section>
+
+    <footer>
+      <span>First come, first served.</span>
+      <span id="last-updated"></span>
+    </footer>
+  </main>
+
+  <dialog id="signup-dialog" class="signup-dialog">
+    <form id="signup-form" method="dialog">
+      <button id="close-dialog" class="icon-button" type="button" aria-label="Close">&times;</button>
+      <p class="eyebrow">CLAIM SPOT</p>
+      <h2>Spot <span id="selected-spot-label"></span></h2>
+      <p class="dialog-copy">Enter your name exactly as you want it displayed on the signup sheet.</p>
+
+      <label for="participant-name">Name</label>
+      <input id="participant-name" name="participant-name" type="text" maxlength="80" autocomplete="name" required>
+      <input id="selected-spot" type="hidden">
+
+      <div id="form-error" class="form-error" role="alert"></div>
+      <button id="submit-button" class="primary-button" type="submit">Claim this spot</button>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
