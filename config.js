@@ -31,7 +31,7 @@ window.POOL_CONFIG = {
     spotsHeading: "Choose a square!\n($34 per square payable to Drake via Venmo, Paypal, or cold hard cash.)",
     spotsHelp: "Green squares are available. Claimed squares show the participant's name.",
     spotWord: "Square",
-    availableLabel: "Available",
+    availableLabel: "",
 
     refreshButton: "Refresh",
     footerText: "2026 Packer Football Pool",
