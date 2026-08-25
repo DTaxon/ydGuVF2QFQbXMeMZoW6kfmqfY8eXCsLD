@@ -12,8 +12,9 @@
   --ink: #18211e;
   --muted: #66716d;
   --line: #d9dfdc;
-  --claimed: #eef1ef;
-  --claimed-ink: #53605b;
+  --claimed: #d7e7d2;
+  --claimed-border: #f4cf63;
+  --claimed-ink: #203731;
   --danger: #b42318;
   --shadow: 0 18px 50px rgba(32, 55, 49, 0.12);
 }
@@ -239,19 +240,15 @@ h1 {
 }
 
 .spot.claimed {
-    background: #d7e7d2;
-    border: 2px solid #f4cf63;
-    color: #203731;
-    cursor: default;
+  cursor: default;
+  border-color: var(--claimed-border);
+  background: var(--claimed);
+  color: var(--claimed-ink);
 }
 
-.spot.claimed .spot-number {
-    color: #203731;
-}
-
+.spot.claimed .spot-number,
 .spot.claimed .spot-name {
-    color: #203731;
-    font-weight: 600;
+  color: var(--claimed-ink);
 }
 
 .spot.claimed.admin-editable {
