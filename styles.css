@@ -12,9 +12,9 @@
   --ink: #18211e;
   --muted: #66716d;
   --line: #d9dfdc;
-  --claimed: #d7e7d2;
-  --claimed-border: #f4cf63;
-  --claimed-ink: #203731;
+  --claimed: #172a25;
+  --claimed-border: #ffb612;
+  --claimed-ink: #ffb612;
   --danger: #b42318;
   --shadow: 0 18px 50px rgba(32, 55, 49, 0.12);
 }
