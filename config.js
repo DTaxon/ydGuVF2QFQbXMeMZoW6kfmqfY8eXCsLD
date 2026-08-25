@@ -14,8 +14,8 @@ window.POOL_CONFIG = {
   //   brandImageUrl: "packers-logo.png",  // image uploaded to this repo
   // or a full https:// image URL.
   // Leave blank to hide the image completely.
-  brandImageUrl: "",
-  brandImageAlt: "PackerLogo.png",
+  brandImageUrl: "PackerLogo.png",
+  brandImageAlt: "Green Bay Packers Logo",
 
   supabaseUrl: "https://wsluhvnzyejzazecxjhe.supabase.co/",
   supabaseKey: "sb_publishable_dGCOYIAu3bHaV_8MxPIjVg_9Auuipbh",
