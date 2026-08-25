@@ -239,10 +239,19 @@ h1 {
 }
 
 .spot.claimed {
-  cursor: default;
-  border-color: var(--line);
-  background: var(--claimed);
-  color: var(--claimed-ink);
+    background: #d7e7d2;
+    border: 2px solid #f4cf63;
+    color: #203731;
+    cursor: default;
+}
+
+.spot.claimed .spot-number {
+    color: #203731;
+}
+
+.spot.claimed .spot-name {
+    color: #203731;
+    font-weight: 600;
 }
 
 .spot.claimed.admin-editable {
