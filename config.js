@@ -8,17 +8,17 @@ window.POOL_CONFIG = {
 
   // Convenience-only admin gate. Because this site is hosted on GitHub Pages,
   // this value can be viewed by someone inspecting the site's source.
-  adminPassword: "CHANGE-ME",
+  adminPassword: "football2026",
 
   // Branding image. You can use either:
   //   brandImageUrl: "packers-logo.png",  // image uploaded to this repo
   // or a full https:// image URL.
   // Leave blank to hide the image completely.
   brandImageUrl: "",
-  brandImageAlt: "Green Bay Packers logo",
+  brandImageAlt: "PackerLogo.png",
 
-  supabaseUrl: "PASTE_YOUR_SUPABASE_URL_HERE",
-  supabaseKey: "PASTE_YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY_HERE",
+  supabaseUrl: "https://wsluhvnzyejzazecxjhe.supabase.co/",
+  supabaseKey: "sb_publishable_dGCOYIAu3bHaV_8MxPIjVg_9Auuipbh",
 
   text: {
     pageTitle: "2026 Packer Football Pool",
