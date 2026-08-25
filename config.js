@@ -28,7 +28,7 @@ window.POOL_CONFIG = {
     openCountLabel: "Open",
     claimedCountLabel: "Claimed",
 
-    spotsHeading: "Choose a square!\n($34 per square payable to Drake via Venmo, Paypal, or cold hard cash.)",
+    spotsHeading: "Choose a square!\n($34 per square payable to Drake via Venmo, PayPal, or cold hard cash. See the email for digital payment information.)",
     spotsHelp: "Claimed squares show the participant's name.",
     spotWord: "Square",
     availableLabel: "",
