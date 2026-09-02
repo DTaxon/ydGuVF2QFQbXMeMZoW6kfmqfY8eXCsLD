@@ -4,7 +4,7 @@
 window.POOL_CONFIG = {
   totalSpots: 25,
   refreshSeconds: 10,
-  allowDuplicateNames: false,
+  allowDuplicateNames: true,
 
   // Convenience-only admin gate. Because this site is hosted on GitHub Pages,
   // this value can be viewed by someone inspecting the site's source.
